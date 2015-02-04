@@ -43,30 +43,38 @@
 function Tooltip(options) {
   var $elem = $(options.elem);
   var html = options.html;
-  var offset = options.offset;
-  var $tip, tipHeight, tipWidth;
 
-  if (offset == undefined) offset = 20;
+  var $tip, tipHeight, tipWidth;
 
   var $body = $(document.body);
 
 
   $elem.on("mouseenter", onElemMouseEnter)
-    .on("mouseleave", onElemMouseLeave);
+    .on("mouseleave", onElemMouseLeave)
+    .on("mousemove", onElemMouseMove);
 
-  function onElemMouseEnter() {
+
+  function onElemMouseEnter(e) {
     if (!$tip) createTip();
-    showTip();
+
+    showTip(e.pageX, e.pageY);
   }
 
-  function onElemMouseLeave() {
+  function onElemMouseLeave(e) {
     hideTip();
+  }
+
+  function onElemMouseMove(e) {
+    moveTip(e.pageX, e.pageY);
   }
 
   function createTip() {
     $tip = $("<div/>", {
       "class": "tooltip",
       html: html,
+      on: { 
+        mousemove: onElemMouseMove
+      },
     }).appendTo($body);
 
     tipWidth = $tip.outerWidth();
@@ -75,24 +83,20 @@ function Tooltip(options) {
     $tip.hide();
   }
 
-  function showTip() {
-    var top = $elem.offset().top - tipHeight - offset;
-    var left = $elem.offset().left + $elem.width() / 2 - tipWidth / 2;
+  function showTip(x, y) {
+    $tip.show(); //before $tip.offset(), because of bug - element get other coordinats when show() after offset()
 
-    if (left < 0) left = 0;
+    moveTip(x, y);
+  }
 
-    if (top < $body.scrollTop()) {
-      top = $elem.offset().top + $elem.height() + offset;
-    };
+  function moveTip(x ,y) {
+    var top = y + 10;
+    var left = x + 10;
 
-    $tip.show(); //before $tip.offset(), because of bug - element get other coordinats when show(), then in offset()
-
-    $tip.offset({
+    $tip.css({
       top: top,
       left: left,
     });
-
-
   }
 
   function hideTip() {
