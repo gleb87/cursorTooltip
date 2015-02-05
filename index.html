@@ -72,7 +72,7 @@ function Tooltip(options) {
     $tip = $("<div/>", {
       "class": "tooltip",
       html: html,
-      on: { 
+      on: {
         mousemove: onElemMouseMove
       },
     }).appendTo($body);
@@ -89,9 +89,18 @@ function Tooltip(options) {
     moveTip(x, y);
   }
 
-  function moveTip(x ,y) {
+  function moveTip(x, y) {
     var top = y + 10;
     var left = x + 10;
+    var $window = $(window);
+
+    if (left + tipWidth > $window.innerWidth() + $window.scrollLeft()) {
+      left = x - 10 - tipWidth;
+    };
+
+    if (top + tipHeight > $window.innerHeight() + $window.scrollTop()) {
+      top = y - 10 - tipHeight;
+    }
 
     $tip.css({
       top: top,
